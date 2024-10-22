@@ -31,7 +31,7 @@ namespace StaminaSystem
         [HarmonyPrefix]
         public static void Prefix(Player __instance)
         {
-                if (!staminaBarCreated)
+            if (!staminaBarCreated)
                 {
                     playerInfo = new PlayerInfoProvider();
                     control = Object.FindObjectOfType<FirstPersonController>();

@@ -8,12 +8,12 @@ using UnityEngine.UI;
 
 namespace StaminaSystem
 {
-    public class CreateStaminaBar : MonoBehaviour
+    public class CreateStaminaBar
     {
         public static void CreateBar()
         {
             GameObject staminaPanel = new GameObject("StaminaBarBackground");
-            Canvas canvas = FindObjectOfType<Canvas>();
+            Canvas canvas = UnityEngine.Object.FindObjectOfType<Canvas>();
 
             if (canvas == null)
             {
