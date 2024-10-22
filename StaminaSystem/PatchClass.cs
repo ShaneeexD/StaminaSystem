@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace StaminaSystem
 {
-    [BepInPlugin("StaminaSystem", "StaminaSystem", "1.0.0")]
+    [BepInPlugin("StaminaSystem", "StaminaSystem", "1.0.1")]
     public class StaminaSystem : BasePlugin
     {
         public static ManualLogSource Logger;
