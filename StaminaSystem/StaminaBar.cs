@@ -119,7 +119,7 @@ namespace StaminaSystem
 
                 if(playerInfo.GetIsJumping())
                 {
-                    UpdateStaminaInstant(StaminaSystem.staminaJumpDrain.Value);
+                    UpdateStamina(StaminaSystem.staminaJumpDrain.Value);
                     control.m_Jumping = false;
                 }
 
@@ -195,12 +195,6 @@ namespace StaminaSystem
 
                         staminaFill.rectTransform.sizeDelta = new Vector2(fillWidth, 10);
                     }
-                }
-
-                static void UpdateStaminaInstant(float amount)
-                {
-                    currentStamina += amount;
-                    currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina); 
                 }
 
                 static void ResetStamina()
