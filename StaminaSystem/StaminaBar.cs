@@ -9,9 +9,9 @@ using static Il2CppSystem.Linq.Expressions.Interpreter.NullableMethodCallInstruc
 namespace StaminaSystem
 {
     [HarmonyPatch(typeof(Player), "Update")]
-    public class StaminaBar : MonoBehaviour
+    public class StaminaBar
     {
-        private static bool staminaBarCreated;
+        public static bool staminaBarCreated;
         private static bool startedRunningOverStam;
 
         public static bool isGamePaused = false;
@@ -23,25 +23,22 @@ namespace StaminaSystem
         public static Color currentColor;
         public static float maxStamina = 100f;
         public static float currentStamina;
-        private static RectTransform staminaFillRect;
+        public static RectTransform staminaFillRect;
+
+        private static PlayerInfoProvider playerInfo;
+        private static FirstPersonController control;
 
         [HarmonyPrefix]
         public static void Prefix(Player __instance)
         {
-            PlayerInfoProvider playerInfo = new PlayerInfoProvider();
-            GameplayControls player = GameplayControls.Instance;
-            FirstPersonController control = Object.FindObjectOfType<FirstPersonController>();
-
-            if (player != null)
-            {
                 if (!staminaBarCreated)
                 {
+                    playerInfo = new PlayerInfoProvider();
+                    control = Object.FindObjectOfType<FirstPersonController>();
                     currentStamina = maxStamina;
-                    CreateStaminaBar();
+                    CreateStaminaBar.CreateBar();
                     staminaBarCreated = true;
                 }
-
-
 
                 if (StaminaSystem.staminaBar.Value == false)
                 {
@@ -51,23 +48,19 @@ namespace StaminaSystem
                     }
                 }
 
-
-
                 if (playerInfo.GetIsRunning() && !isGamePaused)
                 {
                     if (currentStamina > StaminaSystem.minStamToRunJump.Value)
                     {
                         startedRunningOverStam = true;
                     }
-                    UpdateStamina(StaminaSystem.staminaDrain.Value * Time.deltaTime);
+                    CreateStaminaBar.UpdateStamina(StaminaSystem.staminaDrain.Value * Time.deltaTime);
                 }
                 else if (!playerInfo.GetIsRunning() && !isGamePaused && isGameLoaded)
                 {
-                    UpdateStamina(StaminaSystem.staminaRegain.Value * Time.deltaTime);
+                    CreateStaminaBar.UpdateStamina(StaminaSystem.staminaRegain.Value * Time.deltaTime);
                     startedRunningOverStam = false;
                 }
-
-
 
                 if (currentStamina <= 0 && !isGamePaused && isGameLoaded)
                 {
@@ -105,8 +98,6 @@ namespace StaminaSystem
                     }
                 }
 
-
-
                 if (isGamePaused && isGameLoaded && currentStamina != maxStamina)
                 {
                     if (staminaBarCreated)
@@ -115,17 +106,15 @@ namespace StaminaSystem
                     }
                 }
 
-
-
                 if(playerInfo.GetIsJumping())
                 {
-                    UpdateStamina(StaminaSystem.staminaJumpDrain.Value);
+                    CreateStaminaBar.UpdateStamina(StaminaSystem.staminaJumpDrain.Value);
                     control.m_Jumping = false;
                 }
 
                 if(__instance.playerKOInProgress)
                 {
-                    ResetStamina();
+                    CreateStaminaBar.ResetStamina();
                     staminaFill.color = CustomColors.Transparent;
                 }
 
@@ -136,73 +125,8 @@ namespace StaminaSystem
                 else if (currentStamina != maxStamina)
                 {
                     staminaFill.CrossFadeAlpha(1f, 1.0f, true);
-                }
-
-
-
-                static void CreateStaminaBar()
-                {
-                    GameObject staminaPanel = new GameObject("StaminaBarBackground");
-                    Canvas canvas = FindObjectOfType<Canvas>();
-
-                    if (canvas == null)
-                    {
-                        canvas = new GameObject("Canvas").AddComponent<Canvas>();
-                        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                        canvas.gameObject.AddComponent<CanvasScaler>();
-                        canvas.gameObject.AddComponent<GraphicRaycaster>();
-                    }
-
-                    staminaPanel.transform.SetParent(canvas.transform);
-
-                    RectTransform panelRect = staminaPanel.AddComponent<RectTransform>();
-                    panelRect.sizeDelta = new Vector2(0, 0);
-                    panelRect.anchorMin = new Vector2(0.5f, 0);
-                    panelRect.anchorMax = new Vector2(0.5f, 0);
-                    panelRect.anchoredPosition = new Vector2(0, 20);
-
-                    Image panelImage = staminaPanel.AddComponent<Image>();
-                    panelImage.color = Color.black;
-
-                    GameObject fillImageObj = new GameObject("StaminaFill");
-                    fillImageObj.transform.SetParent(staminaPanel.transform);
-
-                    staminaFillRect = fillImageObj.AddComponent<RectTransform>();
-                    staminaFillRect.sizeDelta = new Vector2(500, 10);
-                    staminaFillRect.anchorMin = Vector2.zero;
-                    staminaFillRect.anchorMax = Vector2.one;
-                    staminaFillRect.anchoredPosition = Vector2.zero;
-
-                    staminaFill = fillImageObj.AddComponent<Image>();
-                    staminaFill.color = currentColor;
-
-                    Outline outline = fillImageObj.AddComponent<Outline>();
-                    outline.effectColor = new Color(0f, 0f, 0f, 1f); 
-                    outline.effectDistance = new Vector2(4, 4); 
-
-                }
-
-                static void UpdateStamina(float amount)
-                {
-                    currentStamina += amount;
-                    currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
-
-                    if (staminaBarCreated)
-                    {
-                        staminaFill.fillAmount = currentStamina / maxStamina;
-
-                        float fillWidth = (currentStamina / maxStamina) * 500;
-
-                        staminaFill.rectTransform.sizeDelta = new Vector2(fillWidth, 10);
-                    }
-                }
-
-                static void ResetStamina()
-                {
-                    currentStamina = maxStamina;
-                    staminaFillRect.sizeDelta = new Vector2(500, 10);
-                }
+                }            
             }
         }
-    }
 }
+
