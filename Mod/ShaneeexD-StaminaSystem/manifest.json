@@ -1,6 +1,6 @@
 {
   "name": "StaminaSystem",
-  "version_number": "1.0.0",
+  "version_number": "1.0.2",
   "website_url": "https://github.com/ShaneeexD/StaminaSystem",
   "description": "Adds a brand new stamina system into the game.",
   "dependencies": [
