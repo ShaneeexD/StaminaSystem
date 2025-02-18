@@ -7,7 +7,7 @@ using System.Reflection;
 using static Il2CppSystem.Linq.Expressions.Interpreter.NullableMethodCallInstruction;
 
 namespace StaminaSystem
-{
+{ 
     [HarmonyPatch(typeof(Player), "Update")]
     public class StaminaBar
     {
@@ -25,16 +25,14 @@ namespace StaminaSystem
         public static float currentStamina;
         public static RectTransform staminaFillRect;
 
-        private static PlayerInfoProvider playerInfo;
-        private static FirstPersonController control;
+        public static PlayerInfoProvider playerInfo = new PlayerInfoProvider();
+        public static FirstPersonController control = UnityEngine.Object.FindObjectOfType<FirstPersonController>();
 
         [HarmonyPrefix]
         public static void Prefix(Player __instance)
         {
             if (!staminaBarCreated)
                 {
-                    playerInfo = new PlayerInfoProvider();
-                    control = Object.FindObjectOfType<FirstPersonController>();
                     currentStamina = maxStamina;
                     CreateStaminaBar.CreateBar();
                     staminaBarCreated = true;
@@ -68,7 +66,7 @@ namespace StaminaSystem
                     StatusController.Instance.disabledJump = true;
                     control.m_Jump = false;
 
-                    if (staminaBarCreated)
+                    if (staminaBarCreated && StaminaSystem.staminaBar.Value == true)
                     {
                         staminaFill.color = CustomColors.Red;
                     }
@@ -79,7 +77,7 @@ namespace StaminaSystem
                     StatusController.Instance.disabledJump = true;
                     control.m_Jump = false;
 
-                    if (staminaBarCreated)
+                    if (staminaBarCreated && StaminaSystem.staminaBar.Value == true)
                     {
                         staminaFill.color = CustomColors.Red;
                     }
@@ -91,7 +89,7 @@ namespace StaminaSystem
                         StatusController.Instance.disabledSprint = false;
                         StatusController.Instance.disabledJump = false;
 
-                        if (staminaBarCreated)
+                        if (staminaBarCreated && StaminaSystem.staminaBar.Value == true)
                         {
                             staminaFill.color = CustomColors.Green;
                         }
