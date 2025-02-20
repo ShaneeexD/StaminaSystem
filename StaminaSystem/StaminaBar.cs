@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
@@ -25,106 +25,122 @@ namespace StaminaSystem
         public static float currentStamina;
         public static RectTransform staminaFillRect;
 
-        public static PlayerInfoProvider playerInfo = new PlayerInfoProvider();
-        public static FirstPersonController control = UnityEngine.Object.FindObjectOfType<FirstPersonController>();
+        private static PlayerInfoProvider _playerInfo;
+        private static FirstPersonController _control;
+
+        public static PlayerInfoProvider playerInfo
+        {
+            get
+            {
+                if (_playerInfo == null)
+                    _playerInfo = new PlayerInfoProvider();
+                return _playerInfo;
+            }
+        }
+
+        public static FirstPersonController control
+        {
+            get
+            {
+                if (_control == null)
+                    _control = UnityEngine.Object.FindObjectOfType<FirstPersonController>();
+                return _control;
+            }
+        }
 
         [HarmonyPrefix]
         public static void Prefix(Player __instance)
         {
             if (!staminaBarCreated)
-                {
-                    currentStamina = maxStamina;
-                    CreateStaminaBar.CreateBar();
-                    staminaBarCreated = true;
-                }
+            {
+                currentStamina = maxStamina;
+                CreateStaminaBar.CreateBar();
+                staminaBarCreated = true;
+            }
 
-                if (StaminaSystem.staminaBar.Value == false)
+            if (StaminaSystem.staminaBar.Value == false && staminaBarCreated)
+            {
+                staminaFill.color = CustomColors.Transparent;
+            }
+
+            if (playerInfo.GetIsRunning() && !isGamePaused)
+            {
+                if (currentStamina > StaminaSystem.minStamToRunJump.Value)
                 {
-                    if (staminaBarCreated)
+                    startedRunningOverStam = true;
+                }
+                CreateStaminaBar.UpdateStamina(StaminaSystem.staminaDrain.Value * Time.deltaTime);
+            }
+            else if (!playerInfo.GetIsRunning() && !isGamePaused && isGameLoaded)
+            {
+                CreateStaminaBar.UpdateStamina(StaminaSystem.staminaRegain.Value * Time.deltaTime);
+                startedRunningOverStam = false;
+            }
+
+            if (currentStamina <= 0 && !isGamePaused && isGameLoaded)
+            {
+                StatusController.Instance.disabledSprint = true;
+                StatusController.Instance.disabledJump = true;
+                control.m_Jump = false;
+
+                if (staminaBarCreated && StaminaSystem.staminaBar.Value)
+                {
+                    staminaFill.color = CustomColors.Red;
+                }
+            }
+            else if (currentStamina < StaminaSystem.minStamToRunJump.Value && !startedRunningOverStam && !isGamePaused && isGameLoaded)
+            {
+                StatusController.Instance.disabledSprint = true;
+                StatusController.Instance.disabledJump = true;
+                control.m_Jump = false;
+
+                if (staminaBarCreated && StaminaSystem.staminaBar.Value)
+                {
+                    staminaFill.color = CustomColors.Red;
+                }
+            }
+            else
+            {
+                if (!isGamePaused && isGameLoaded)
+                {
+                    StatusController.Instance.disabledSprint = false;
+                    StatusController.Instance.disabledJump = false;
+
+                    if (staminaBarCreated && StaminaSystem.staminaBar.Value)
                     {
-                        staminaFill.color = CustomColors.Transparent;
+                        staminaFill.color = CustomColors.Green;
                     }
                 }
+            }
 
-                if (playerInfo.GetIsRunning() && !isGamePaused)
+            if (isGamePaused && isGameLoaded && currentStamina != maxStamina)
+            {
+                if (staminaBarCreated)
                 {
-                    if (currentStamina > StaminaSystem.minStamToRunJump.Value)
-                    {
-                        startedRunningOverStam = true;
-                    }
-                    CreateStaminaBar.UpdateStamina(StaminaSystem.staminaDrain.Value * Time.deltaTime);
-                }
-                else if (!playerInfo.GetIsRunning() && !isGamePaused && isGameLoaded)
-                {
-                    CreateStaminaBar.UpdateStamina(StaminaSystem.staminaRegain.Value * Time.deltaTime);
-                    startedRunningOverStam = false;
-                }
-
-                if (currentStamina <= 0 && !isGamePaused && isGameLoaded)
-                {
-                    StatusController.Instance.disabledSprint = true;
-                    StatusController.Instance.disabledJump = true;
-                    control.m_Jump = false;
-
-                    if (staminaBarCreated && StaminaSystem.staminaBar.Value == true)
-                    {
-                        staminaFill.color = CustomColors.Red;
-                    }
-                }
-                else if (currentStamina < StaminaSystem.minStamToRunJump.Value && !startedRunningOverStam && !isGamePaused && isGameLoaded)
-                {
-                    StatusController.Instance.disabledSprint = true;
-                    StatusController.Instance.disabledJump = true;
-                    control.m_Jump = false;
-
-                    if (staminaBarCreated && StaminaSystem.staminaBar.Value == true)
-                    {
-                        staminaFill.color = CustomColors.Red;
-                    }
-                }
-                else
-                {
-                    if (!isGamePaused && isGameLoaded)
-                    {
-                        StatusController.Instance.disabledSprint = false;
-                        StatusController.Instance.disabledJump = false;
-
-                        if (staminaBarCreated && StaminaSystem.staminaBar.Value == true)
-                        {
-                            staminaFill.color = CustomColors.Green;
-                        }
-                    }
-                }
-
-                if (isGamePaused && isGameLoaded && currentStamina != maxStamina)
-                {
-                    if (staminaBarCreated)
-                    {
-                        staminaFill.color = CustomColors.Transparent;
-                    }
-                }
-
-                if(playerInfo.GetIsJumping())
-                {
-                    CreateStaminaBar.UpdateStamina(StaminaSystem.staminaJumpDrain.Value);
-                    control.m_Jumping = false;
-                }
-
-                if(__instance.playerKOInProgress)
-                {
-                    CreateStaminaBar.ResetStamina();
                     staminaFill.color = CustomColors.Transparent;
                 }
-
-                if (currentStamina == maxStamina)
-                {
-                    staminaFill.CrossFadeAlpha(0f, 0.2f, true);
-                }
-                else if (currentStamina != maxStamina)
-                {
-                    staminaFill.CrossFadeAlpha(1f, 1.0f, true);
-                }            
             }
-        }
-}
 
+            if(playerInfo.GetIsJumping())
+            {
+                CreateStaminaBar.UpdateStamina(StaminaSystem.staminaJumpDrain.Value);
+                control.m_Jumping = false;
+            }
+
+            if(__instance.playerKOInProgress)
+            {
+                CreateStaminaBar.ResetStamina();
+                staminaFill.color = CustomColors.Transparent;
+            }
+
+            if (currentStamina == maxStamina)
+            {
+                staminaFill.CrossFadeAlpha(0f, 0.2f, true);
+            }
+            else if (currentStamina != maxStamina)
+            {
+                staminaFill.CrossFadeAlpha(1f, 1.0f, true);
+            }            
+        }
+    }
+}
