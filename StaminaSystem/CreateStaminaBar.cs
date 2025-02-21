@@ -1,18 +1,21 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using StaminaSystem;
 
 namespace StaminaSystem
 {
     public class CreateStaminaBar
     {
+        private static GameObject staminaPanel;
+
         public static void CreateBar()
         {
-            GameObject staminaPanel = new GameObject("StaminaBarBackground");
+            staminaPanel = new GameObject("StaminaBarBackground");
             Canvas canvas = UnityEngine.Object.FindObjectOfType<Canvas>();
 
             if (canvas == null)
@@ -49,6 +52,15 @@ namespace StaminaSystem
             Outline outline = fillImageObj.AddComponent<Outline>();
             outline.effectColor = new Color(0f, 0f, 0f, 1f);
             outline.effectDistance = new Vector2(4, 4);
+        }
+
+        public static void DestroyBar()
+        {
+            if (staminaPanel != null)
+            {
+                UnityEngine.Object.Destroy(staminaPanel.gameObject);
+                StaminaSystem.Logger.LogInfo("Deleted old stamina bar");
+            }
         }
 
         public static void UpdateStamina(float amount)

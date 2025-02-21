@@ -40,7 +40,6 @@ public class PlayerInfoProvider
         Player player = Player.Instance;
         return player.isGrounded;
     }
-
     public float GetMovementRunSpeed()
     {
         GameplayControls player = GameplayControls.Instance;
@@ -100,6 +99,16 @@ public class PlayerInfoProvider
     {
         Player player = Player.Instance;
         player.blackedOut = amount;
+    }
+    public void AddEnergy(float amount)
+    {
+        Player player = Player.Instance;
+        player.AddEnergy(amount);
+    }
+    public void AddNourishment(float amount)
+    {
+        Player player = Player.Instance;
+        player.AddNourishment(amount);
     }
     public Telephone GetAnsweringPhone()
     {
