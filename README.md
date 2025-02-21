@@ -14,3 +14,5 @@ Includes config options:
 - Minimum stamina in order to be able to attack again
 - Enable/disable visible stamina bar
 
+# Thunderstore Listing
+https://thunderstore.io/c/shadows-of-doubt/p/ShaneeexD/StaminaSystem/
