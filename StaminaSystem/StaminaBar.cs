@@ -195,17 +195,14 @@ namespace StaminaSystem
             {        
                 float delayAmount = (StaminaSystem.minStamToRunJump.Value - StaminaBar.currentStamina + 0.7f) / 20;
 
-                // Increase the attack delay when stamina is too low
-
                 __instance.attackMainDelay += delayAmount;
 
                 hasBeenDelayed = true;
                 //StaminaSystem.Logger.LogInfo("Attack delay increased due to low stamina.");
-
-                // Reset hasBeenDelayed after the delay
+               
                 Task.Run(async () =>
                 {
-                    await Task.Delay((int)(delayAmount * 1000)); // Convert seconds to milliseconds
+                    await Task.Delay((int)(delayAmount * 1000));
                     hasBeenDelayed = false;
                 });
             } 
