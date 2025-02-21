@@ -14,6 +14,3 @@ Includes config options:
 - Minimum stamina in order to be able to attack again
 - Enable/disable visible stamina bar
 
-# Source code:
-
-https://github.com/ShaneeexD/StaminaSystem
